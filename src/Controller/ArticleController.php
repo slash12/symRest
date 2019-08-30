@@ -22,8 +22,8 @@ class ArticleController extends Controller
      * @return array
      */
     public function postArticleAction(Request $request)
-    {
-        $request = $request->request->all()[0];
+    {        
+        $request = $request->request->all();
         $article = new Article();
         $article->setName($request['name']);
         $article->setDescription($request['description']);
