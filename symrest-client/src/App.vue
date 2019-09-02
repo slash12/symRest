@@ -1,19 +1,17 @@
 <template>
-  <div id="app">
-    <ListArticles />
-    <CreateArticle />
+  <div id="app">    
+    <nav>
+        <router-link to="/">List all articles</router-link>
+        <router-link to="/create">Add articles</router-link>        
+        <router-view></router-view>
+    </nav>
   </div>
 </template>
 
 <script>
-import ListArticles from './components/ListArticles.vue'
-import CreateArticle from './components/CreateArticle.vue'
-
 export default {
   name: 'app',
   components: {
-    ListArticles,
-    CreateArticle
   }
 }
 </script>

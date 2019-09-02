@@ -12,6 +12,12 @@
                 <tr v-for="article in articles" v-bind:key="article.id">
                     <th>{{ article.name }}</th>
                     <th>{{ article.description }}</th>
+                    <th><router-link :to="{name: 'getArticle', params: {id: article.id}}">View article</router-link></th>
+                    <th>
+                        <button type="button" @click="deleteArticle(article.id)">
+                            Delete Article
+                        </button>
+                    </th>
                 </tr>
             </tbody>
         </table>
@@ -36,8 +42,12 @@ export default {
     methods: {
         getArticles(){
             apiService.getArticles().then((data) => {
-                this.articles = data;                
+                this.articles = data;
             });
+        },
+        deleteArticle(id){            
+            apiService.deleteArticle(id);
+            location.reload();
         }
     },
     mounted() {

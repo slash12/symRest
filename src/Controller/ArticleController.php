@@ -19,7 +19,7 @@ class ArticleController extends Controller
      * Create Article
      * @FOSRest\Post("/article")
      *
-     * @return array
+     * @return JsonResponse
      */
     public function postArticleAction(Request $request)
     {        
@@ -42,7 +42,7 @@ class ArticleController extends Controller
      * Lists all Articles.
      * @FOSRest\Get("/articles")
      *
-     * @return array
+     * @return Response
      */
     public function getArticleAction()
     {
@@ -56,5 +56,98 @@ class ArticleController extends Controller
         $jsonArticles = $serializer->serialize($articles, 'json');        
 
         return new Response($jsonArticles);
+    }
+
+    /**
+     * Get an article by id
+     * @FOSRest\Get("/article/{id}")
+     *
+     * @return Response
+     */
+    public function getArticleActionById($id)
+    {
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+        $repository = $this->getDoctrine()->getRepository(Article::class);
+        // find article by id
+        $article = $repository->find($id);
+        // convert result into json
+        $jsonArticle = $serializer->serialize($article, 'json');        
+
+        return new Response($jsonArticle);
+    }
+
+    /**
+     * Update an article by id
+     * @FOSRest\Put("/article/{id}")
+     * 
+     * @param int $id
+     * @param Request $request
+     */
+    public function updateArticleById(Request $request, $id)
+    {        
+        $request = $request->request->all();
+        $articleRepo = $this->getDoctrine()->getRepository(Article::class);
+        $article = $articleRepo->find($id);
+
+        if (null == $article) {
+            return new JsonResponse([
+                // 404
+                'status' => Response::HTTP_NOT_FOUND
+            ]);
+        }        
+
+        // update article
+        if (null != $request['name']) {
+            $article->setName($request['name']);
+        }
+        
+        if (null != $request['description']) {
+            $article->setDescription($request['description']);
+        }
+        
+        if (null != $request['name'] || null != $request['description']) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($article);
+            $em->flush();
+        }
+
+        return new JsonResponse([
+            // 202
+            'statusCode' => Response::HTTP_ACCEPTED,
+            'txtMsg'     => 'The article is updated'
+        ]);
+    }
+
+    /**
+     * Delete an article
+     * @FOSRest\Delete("/article/{id}")
+     *
+     * @param int $id
+     * 
+     * @return JsonResponse
+     */
+    public function deleteArticle($id)
+    {
+        $articleRepo = $this->getDoctrine()->getRepository(Article::class);
+        $article = $articleRepo->find($id);
+
+        if (null == $article) {
+            return new JsonResponse([
+                // 404
+                'status' => Response::HTTP_NOT_FOUND
+            ]);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($article);
+        $em->flush();
+
+        return new JsonResponse([
+            // 202
+            'statusCode' => Response::HTTP_ACCEPTED,
+            'txtMsg'     => 'This article is deleted'
+        ]);
     }
 }

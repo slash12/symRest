@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div>        
         <input v-model="article['name']" placeholder="Add an article name...">
         <input v-model="article['description']" placeholder="Add an article description...">
         <button @click="addArticle" type="button">Submit</button>
